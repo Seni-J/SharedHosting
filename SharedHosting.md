@@ -93,7 +93,9 @@
 
 ### Installation des packages 
 
+nano /etc/apt/sources.list
 
+deb http://debian.ethz.ch/debian stable main contrib non-free
 
-
+apt-get update && apt-get upgrade
 
