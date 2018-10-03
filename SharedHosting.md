@@ -12,7 +12,7 @@
   - Name → *sharedhosting*
   - Number of processors → 1
   - Memory → 512 MB
-  - Network Connection → Use bridged networking
+  - Network Connection → Use network address translation (NAT)
   - I/O Controller Types → LSI Logic (Recommended)
   - Virtual Disk Type → SCSI (Recommended)
   - Disk → Create a new virtual disk
@@ -93,9 +93,68 @@
 
 ### Installation des packages 
 
-nano /etc/apt/sources.list
+#### Commande à taper 
 
-deb http://debian.ethz.ch/debian stable main contrib non-free
+- Editer le fichier pour modifier la connexion au serveur pour les téléchargements des paquets 
 
-apt-get update && apt-get upgrade
+> nano /etc/apt/sources.list
+
+- Rajouter cette ligne dans le fichier et mettre en commentaire toutes les autres avec un "#"
+
+> deb http://debian.ethz.ch/debian stable main contrib non-free
+
+- Mettre à jour le dépôt
+
+> apt-get update && apt-get upgrade
+
+- Installation de sudo 
+
+> apt-get install sudo 
+
+- Configurer le fichier sudoers en étant connecté avec root
+
+>nano /etc/sudoers
+
+- Ajouter dans le fichier 
+
+> *[user]* ALL=(ALL:ALL) ALL
+
+### Installation de SSH
+
+- Commande à taper en sudo ou root 
+
+> apt-get install openssh-server
+
+- Reprendre l'adresse IP du serveur avec la commande 
+
+> ip addr
+
+## Installation de Nginx et PHP-FPM
+
+- Commande pour installer Nginx et PHP-FPM
+
+> sudo apt-get install nginx php-fpm
+
+- Lancer le serveur à chaque demarrage de la VM
+
+>sudo systemctl enable nginx
+
+## Installation de MariaDB
+
+Pour installer MariaDB, suivez les commandes suivantes:
+
+```
+sudo apt-get install software-properties-common dirmngr
+sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
+sudo add-apt-repository 'deb [arch=amd64,i386,ppc64el] http://mirror.mva-n.net/mariadb/repo/10.3/debian stretch main'
+```
+
+Une fois que les clés ont été ajoutés et que la liste des sources a été mise à jour, installez MariaDB:
+
+```
+sudo apt-get update
+sudo apt-get install mariadb-server
+```
+
+Saisir lensuite le mot de passe souhaité pour la base de donnée MariaDB.
 
