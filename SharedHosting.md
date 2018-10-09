@@ -156,5 +156,69 @@ sudo apt-get update
 sudo apt-get install mariadb-server
 ```
 
-Saisir lensuite le mot de passe souhaité pour la base de donnée MariaDB.
+Saisir ensuite le mot de passe souhaité pour la base de donnée MariaDB.
+
+Vérifier que la connexion à la base de donnée est fonctionnelle avec la commande
+
+> mysql -p
+
+* Le paramètre -p est requis pour rentrer le mot de passe. Rentrer votre mot de passe.
+
+Nous allons finaliser la configuration. Tapez la commande suivante:
+
+> sudo mysql_secure_installation
+
+Rentrez votre mot de passe. Ensuite, le mot de passe de la base de donnée root est demandée. Saisissez là aussi.
+
+Nous aurons ensuite une série de question. La première question :
+
+> Change the root password ? [Y/n]
+
+Nous pouvons mettre "n" car nous avons déjà un mot de passe.
+
+Deuxième question :
+
+> Remove anonymous users? [Y/n]
+
+Tapez "Y" et appuyez sur la touche entrée.
+
+Troisième question :
+
+> Disallow root login remotely? [Y/n] 
+
+Tapez "Y" et appuyez sur la touche entrée.
+
+Quatrième question :
+
+> Remove test database and access to it? [Y/n] 
+
+Tapez "Y" et appuyez sur la touche entrée.
+
+Cinquième question :
+
+> Reload privilege tables now? [Y/n]
+
+Tapez "Y" et appuyez sur la touche entrée.
+
+## Configuration de MariaDB
+
+Connectez vous à la base de donnée MariaDB. Pour ce faire, saisir la commande suivante :
+
+> sudo mysql -u root -p
+
+Une fois connecté, nous allons créer un utilisateur pour une base de donnée.
+
+> CREATE USER 'nomUtilisateur' IDENTIFIED BY 'motdepasse';
+
+Nous allons aussi créer une base de donnée pour que l'utilisateur puisse l'utiliser.
+
+> CREATE DATABASE nomdb;
+
+
+
+
+
+
+
+
 
