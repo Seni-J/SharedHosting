@@ -202,9 +202,9 @@ Tapez "Y" et appuyez sur la touche entrée.
 
 ## Configuration de MariaDB
 
-Connectez vous à la base de donnée MariaDB. Pour ce faire, saisir la commande suivante :
+Connectez vous à la base de donnée MariaDB. Pour ce faire, saisir la commande suivante pour se connecter avec le user root:
 
-> sudo mysql -u root -p
+> mysql -u root -p
 
 Une fois connecté, nous allons créer un utilisateur pour une base de donnée.
 
@@ -213,6 +213,45 @@ Une fois connecté, nous allons créer un utilisateur pour une base de donnée.
 Nous allons aussi créer une base de donnée pour que l'utilisateur puisse l'utiliser.
 
 > CREATE DATABASE nomdb;
+
+Une fois la base de donnée crée, nous allons donner les droits à l'user pour qu'il puisse accéder à sa DB.
+
+>  GRANT ALL privileges on nomDB.* to 'nomUtilisateur'@'localhost' identified by 'motdepasse';
+
+Il faut ensuite appliquer les privilièges :
+
+> FLUSH privileges;
+
+Nous pouvons vérifier que les droits ont bien été donnés à notre utilisateur :
+
+> SHOW GRANTS FOR 'nomUtilisateur';
+
+Un tableau s'affiche de cette manière :
+
+```
++--------------------------------------------------------------------------------+
+|                     Grants for 'nomUtilisateur'@localhost                      |
++--------------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO 'nomUtilisateur'@'localhost' IDENTIFIED BY PASSWORD      | |'*0761F91260E962512A8687712229EFA16CEAEA59'                                     |
+| GRANT ALL PRIVILEGES ON `nomDB`.* TO 'nomUtilisateur'@'localhost'              |
++--------------------------------------------------------------------------------+
+```
+
+Nous pouvons voir que la base de donnée crée spécialement pour l'utilisateur est accessible par ce dernier sur la dernière ligne.
+
+Nous pouvons ensuite nous déconnecter de root et accéder depuis notre utilisateur.
+
+> exit
+>
+> mysql -u nomUtilisateur -p
+
+Une fois connecté sur notre utilisateur, tapez la commande suivante pour afficher les bases de données accessible pour ce compte :
+
+> SHOW DATABASES;
+
+Votre "nomDB" doit être visible dans le tableau affiché.
+
+La création de la base de donnée ainsi que les permissions attribués pour notre utilisateur sont maintenant terminés.
 
 
 
