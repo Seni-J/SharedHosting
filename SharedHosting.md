@@ -200,6 +200,22 @@ Cinquième question :
 
 Tapez "Y" et appuyez sur la touche entrée.
 
+## Création de l'utilisateur
+
+Se connecter en root avec la commande : su
+
+Création de l'utilisateur 
+
+> adduser `nom d'utilsateur`
+
+Insérer un mot de passe temporaire et confirmer le ensuite
+
+Plusieurs données vous seront demandés, libre à vous de les remplire ou non
+
+Maintenant on va bloquer l'accès des autres utilisateurs sur le répertoire du nouvel utilisateur créé précédemment avec la commande suivant 
+
+> chmod 700 /home/repertoire_du_nouvel_utilisateur
+
 ## Configuration de MariaDB
 
 Connectez vous à la base de donnée MariaDB. Pour ce faire, saisir la commande suivante :
@@ -213,6 +229,8 @@ Une fois connecté, nous allons créer un utilisateur pour une base de donnée.
 Nous allons aussi créer une base de donnée pour que l'utilisateur puisse l'utiliser.
 
 > CREATE DATABASE nomdb;
+
+## Configuration de NGinx
 
 
 
