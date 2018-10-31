@@ -1,2 +1,2 @@
-Install/config de nginx
-https://www.cyberciti.biz/faq/howto-install-setup-nginx-on-debian-linux-9/
+config de nginx
+https://www.sodifrance.fr/blog/vos-premiers-pas-avec-le-serveur-nginx/
