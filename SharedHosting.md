@@ -206,7 +206,7 @@ Connectez vous à la base de donnée MariaDB. Pour ce faire, saisir la commande 
 
 > mysql -u root -p
 
-Une fois connecté, nous allons créer un utilisateur pour une base de donnée.
+Une fois connecté, nous allons créer un utilisateur pour une base de donnée. Les guillemets sont importants.
 
 > CREATE USER 'nomUtilisateur' IDENTIFIED BY 'motdepasse';
 
@@ -252,6 +252,8 @@ Une fois connecté sur notre utilisateur, tapez la commande suivante pour affich
 Votre "nomDB" doit être visible dans le tableau affiché.
 
 La création de la base de donnée ainsi que les permissions attribués pour notre utilisateur sont maintenant terminés.
+
+Vous pouvez désormais quitter MariaDB.
 
 
 
