@@ -1,2 +1,5 @@
 config de nginx
 https://www.sodifrance.fr/blog/vos-premiers-pas-avec-le-serveur-nginx/
+
+config nginx, php-fpm error 502
+https://www.datadoghq.com/blog/nginx-502-bad-gateway-errors-php-fpm/
