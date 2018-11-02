@@ -408,9 +408,11 @@ Pour chaque utilisateur, il faut limiter l'accès à l'home uniquement pour l'ut
 
 Faire la même commande excepté que cette fois-ci, cela sera le dossier du site de l'utilisateur qui se trouve dans /var/www.
 
-> sudo chmod 711 /var/www/siteutilisateur
+> sudo chmod 711 /var/www/siteutilisateurcd 
 
 ## Séparation des pools
 
-  
+ Désactiver fonctions dans /etc/php/7.0/fpm/php.ini
+
+ajouter dans disable_functions = shell_exec,system,file_get_content,....
 
