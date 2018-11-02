@@ -162,7 +162,7 @@ Vérifier que la connexion à la base de donnée est fonctionnelle avec la comma
 
 > mysql -p
 
-* Le paramètre -p est requis pour rentrer le mot de passe. Rentrer votre mot de passe.
+- Le paramètre -p est requis pour rentrer le mot de passe. Rentrer votre mot de passe.
 
 Nous allons finaliser la configuration. Tapez la commande suivante:
 
@@ -220,19 +220,87 @@ Maintenant on va bloquer l'accès des autres utilisateurs sur le répertoire du 
 
 > chmod 700 /home/repertoire_du_nouvel_utilisateur
 
-## Création d'une base de données 
+## Configuration de MariaDB 
 
-Connectez vous à la base de donnée MariaDB. Pour ce faire, saisir la commande suivante :
+Connectez vous à la base de donnée MariaDB. Pour ce faire, saisir la commande suivante pour se connecter avec le user root:
 
-> sudo mysql -u root -p
+> mysql -u root -p
 
-Une fois connecté, nous allons créer un utilisateur pour une base de donnée.
+Une fois connecté, nous allons créer un utilisateur pour une base de donnée. Les guillemets sont importants.
 
 > CREATE USER 'nomUtilisateur' IDENTIFIED BY 'motdepasse';
 
 Nous allons aussi créer une base de donnée pour que l'utilisateur puisse l'utiliser.
 
 > CREATE DATABASE nomdb;
+
+Une fois la base de donnée crée, nous allons donner les droits à l'user pour qu'il puisse accéder à sa DB.
+
+> GRANT ALL privileges on nomDB.* to 'nomUtilisateur'@'localhost' identified by 'motdepasse';
+
+Il faut ensuite appliquer les privilièges :
+
+> FLUSH privileges;
+
+Nous pouvons vérifier que les droits ont bien été donnés à notre utilisateur :
+
+> SHOW GRANTS FOR 'nomUtilisateur';
+
+Un tableau s'affiche de cette manière :
+
+```
++--------------------------------------------------------------------------------+
+|                     Grants for 'nomUtilisateur'@localhost                      |
++--------------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO 'nomUtilisateur'@'localhost' IDENTIFIED BY PASSWORD      | |'*0761F91260E962512A8687712229EFA16CEAEA59'                                     |
+| GRANT ALL PRIVILEGES ON `nomDB`.* TO 'nomUtilisateur'@'localhost'              |
++--------------------------------------------------------------------------------+
+```
+
+Nous pouvons voir que la base de donnée crée spécialement pour l'utilisateur est accessible par ce dernier sur la dernière ligne.
+
+Nous pouvons ensuite nous déconnecter de root et accéder depuis notre utilisateur.
+
+> exit
+>
+> mysql -u nomUtilisateur -p
+
+Une fois connecté sur notre utilisateur, tapez la commande suivante pour afficher les bases de données accessible pour ce compte :
+
+> SHOW DATABASES;
+
+Votre "nomDB" doit être visible dans le tableau affiché.
+
+La création de la base de donnée ainsi que les permissions attribués pour notre utilisateur sont maintenant terminés.
+
+Vous pouvez désormais quitter MariaDB.
+
+## Création d'un socket php
+
+Se rendre dans le dossier suivant 
+
+> cd /etc/php/7.0/fpm/pool.d
+
+Copier le fichier déjà présent à l'intérieur du répertoire
+
+> sudo cp www.conf utilisateur.conf
+
+Editez le fichier précédément copié 
+
+> sudo nano utilisateur.conf
+
+Modifier les valeurs suivantes dans le fichier 
+
+- La valeur [www] doit changer par [nom_de_domaine_du_site]
+- user = www-data => user = utilisateur
+- group = www-data => groupe = utilisateur
+- listen = /run/php/php7.0-fpm.sock => listen = /run/php/php7.0-fpm-utilisateur.sock
+
+Relancez ensuite php7.0-fpm
+
+> sudo service php7.0-fpm restart
+
+Suite à celà un nouveau fichier a été créé, dans le dossier /var/run/php/ 
 
 ## Configuration de NGinx
 
@@ -293,6 +361,11 @@ server {
         # First attempt to serve request as file, then
         # as directory, then fall back to displaying a 404.
         try_files $uri $uri/ =404;
+    }
+    
+    location ~ \.php$ {
+    	include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php7.0-fpm-utilisateur.sock;
     }
 }
 ```
