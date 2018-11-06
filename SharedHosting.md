@@ -408,11 +408,15 @@ Pour chaque utilisateur, il faut limiter l'accès à l'home uniquement pour l'ut
 
 Faire la même commande excepté que cette fois-ci, cela sera le dossier du site de l'utilisateur qui se trouve dans /var/www.
 
-> sudo chmod 711 /var/www/siteutilisateurcd 
+> sudo chmod 711 /var/www/siteutilisateur
 
-## Séparation des pools
+Pour chaque dossier de l'utilisateur (/home/nomutilisateur ainsi que /var/www/nomdusitedelutilisateur), il faut lui assigner son user. 
 
- Désactiver fonctions dans /etc/php/7.0/fpm/php.ini
-
-ajouter dans disable_functions = shell_exec,system,file_get_content,....
+> sudo chown nomutilisateur:nomutilisateur /home/nomutilisateur
+>
+> sudo chown nomutilisateur:www-data /var/www/nomdusitedelutilisateur
+>
+> sudo chmod 751 /var/www/nomdusitedelutilisateur/html/
+>
+> sudo chmod 640 /var/www/nomdusitedelutilisateur/html/*
 
