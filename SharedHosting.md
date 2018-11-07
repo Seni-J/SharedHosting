@@ -4,11 +4,11 @@
 
 ## Installation VMware Workstation
 
-  - File → New → Virtual Machine
+  - File → New Virtual Machine
   - Virtual Machine Configuration → Custom (advanced)
   - Hardware compatibility → Workstation *[dernière version]*
   - Install operating system from → I will install the operating system later
-  - Guest Operating System → 2. Linux → Debian *[dernière version]* 64-bit
+  - Guest Operating System → Linux → Debian *[dernière version]* 64-bit
   - Name → *sharedhosting*
   - Number of processors → 1
   - Memory → 512 MB
@@ -29,7 +29,7 @@
 
 - Lancer la VM → Install 
 - Sélectionner Français →  Suisse →  Suisse romand
-- Nom de la machine : SharedHost 
+- Nom de la machine : SharedHosting 
 - Domaine : -
 - Mot de passe root : *[au choix de l'admin]*
 - Nom complet du nouvel utilisateur : *[au choix de l'admin]*
@@ -93,7 +93,7 @@
 
 ### Installation des packages 
 
-#### Commande à taper 
+#### Commande à taper en root (pour le moment)
 
 - Editer le fichier pour modifier la connexion au serveur pour les téléchargements des paquets 
 
@@ -125,19 +125,47 @@
 
 > sudo apt-get install openssh-server
 
-- Reprendre l'adresse IP du serveur avec la commande 
-
-> ip addr
-
 ## Installation de Nginx et PHP-FPM
 
 - Commande pour installer Nginx et PHP-FPM
 
 > sudo apt-get install nginx php-fpm
 
-- Avec la commande suivante Nginx va se lancer automatiquement au lancement de la VM
+- Avec la commande suivante Nginx va démarrer lorsque le serveur est lancé
 
 > sudo systemctl enable nginx
+>
+> sudo service nginx start
+
+- Nous allons aussi démarrer php-fpm au démarrage du serveur
+
+>sudo systemctl enable php7.0-fpm
+>
+>sudo service php7.0-fpm start
+
+### Passer la machine virtuelle en bridged 
+
+Eteindre la machine pour faire la modification 
+
+> sudo shutdown now 
+
+Dans Vmware aller dans les paramètres de la machine virutelle :
+
+- VM → settings → Network adapter → cocher Bridged 
+
+La configuration est terminée, relancé le serveur.
+
+Notez l'adresse IP du serveur pour pouvoir se connecter en SSH avec la commande suivante. L'adresse IP à reprendre est celle sous `ens32`
+
+> ip addr
+
+Dans CMDER ou un terminal lancer la commande suivante pour vous connecter au serveur
+
+> ssh `user`@`ip_serveur`
+
+À la question : Are you sure you want to continue connecting (yes/no)? Ecrivez : yes puis appuyez sur enter
+
+Entrez le mot de passe de l'utilisateur
 
 ## Installation de MariaDB
 
@@ -156,11 +184,11 @@ sudo apt-get update
 sudo apt-get install mariadb-server
 ```
 
-Saisir ensuite le mot de passe souhaité pour la base de donnée MariaDB.
+Saisir ensuite le mot de passe souhaité pour la base de données MariaDB puis confirmez-le.
 
 Vérifier que la connexion à la base de données soit fonctionnelle avec la commande
 
-> mysql -p
+> sudo mysql -p
 
 - Le paramètre -p est requis pour rentrer le mot de passe. Rentrer votre mot de passe.
 
@@ -214,11 +242,11 @@ Plusieurs données vous seront demandés, libre à vous de les remplir ou non.
 
 Tapez la commande suivante pour forcer l'utilisateur à changer son mot de passe au premier login
 
-> sudo passwd -e `nom d'utilsateur`
+> sudo passwd -e `user`
 
 Maintenant on va bloquer l'accès des autres utilisateurs sur le répertoire du nouvel utilisateur créé précédemment avec la commande suivant 
 
-> chmod 700 /home/repertoire_user
+> chmod 700 /home/`user`
 
 ## Configuration de MariaDB 
 
@@ -277,6 +305,8 @@ Vous pouvez désormais quitter MariaDB.
 
 ## Création d'un socket php
 
+Avoir les accès sudo ou être connecté en root pour les commandes suivantes.
+
 Se rendre dans le dossier suivant 
 
 > cd /etc/php/7.0/fpm/pool.d
@@ -306,7 +336,7 @@ Suite à celà un nouveau fichier a été créé, dans le dossier /var/run/php/
 
 Créeons un site pour un utilisateur 
 
-> sudo mdkir -p /var/www/`site1.monserver.com`/html 
+> sudo mkdir -p /var/www/`site1.monserver.com`/html 
 
 Changer le propriétaire du dossier 
 
@@ -331,7 +361,7 @@ Inserez ceci dans le fichier
 
 Créer le fichier de configuration pour le site
 
-> sudo nano /etc/nginx/sites-avalaible/site1
+> sudo nano /etc/nginx/sites-available/`user`.conf
 
 Copié les lignes ci-dessous pour chaque nouveau fichier de configuration
 
@@ -350,12 +380,12 @@ server {
     #
     # include snippets/snakeoil.conf;
 
-    root /var/www/site1.monserver.com/html;
+    root /var/www/"site1.monserver.com"/html;
 
     # Add index.php to the list if you are using PHP
     index index.html index.htm ;
 
-    server_name site1.monserver.com;
+    server_name "site1.monserver.com";
 
     location / {
         # First attempt to serve request as file, then
@@ -365,10 +395,12 @@ server {
     
     location ~ \.php$ {
     	include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/run/php/php7.0-fpm-`user`.sock;
+        fastcgi_pass unix:/run/php/php7.0-fpm-"user".sock;
     }
 }
 ```
+
+NE PAS OUBLIER DE MODIFIER LES VALEURS ENTRE GUILLEMENTS ET DE SUPPRIMER CES DERNIERS !!!	
 
 Etant donné que notre serveur est en local, modifiez le fichier host sur Windows ou sur Linux ou Mac (lancer un terminal)
 
@@ -390,7 +422,7 @@ Inserez les lignes suivantes
 
 Créer un lien symbolique pour pouvoir accéder au site
 
-> sudo ln -s /etc/nginx/sites-available/site1 /etc/nginx/sites-enabled/
+> sudo ln -s /etc/nginx/sites-available/`user`.conf /etc/nginx/sites-enabled/
 
 Redémarrer ensuite le serveur Nginx
 
@@ -398,7 +430,7 @@ Redémarrer ensuite le serveur Nginx
 
 Tester ensuite la configuration sur un navigateur en mettant la ligne suivante dans la barre de recherche 
 
-> site.monserveur.com
+> `user`.com
 
 # Isolation des utilisateurs
 
@@ -406,9 +438,9 @@ Pour chaque utilisateur, il faut limiter l'accès au répertoire home pour l'uti
 
 > sudo chmod 700 /home/`user`
 
-Grâce à celà, n'importe quel utilisateur (excepté root et un utilisateur ayant les droits sudo) peuvent accéder au répertoire ou lister le contenu. 
+Grâce à celà, n'importe quel utilisateur (excepté root et un utilisateur ayant les droits sudo) ne peuvent accéder au répertoire ou lister le contenu. 
 
-Faire la même commande excepté que cette fois-ci, ce sera sur le dossier du site de l'utilisateur qui se trouve dans /var/www/.
+Faire la même commande sauf que cette fois-ci, ce sera sur le dossier du site de l'utilisateur qui se trouve dans /var/www/.
 
 > sudo chmod 711 /var/www/siteutilisateur
 
