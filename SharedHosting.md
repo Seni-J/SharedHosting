@@ -113,9 +113,9 @@
 
 - Configurer le fichier sudoers en étant connecté avec root
 
->nano /etc/sudoers
+> nano /etc/sudoers
 
-- Ajouter dans le fichier 
+- Ajouter dans le fichier l'utilisateur crée précédemment  
 
 > *[user]* ALL=(ALL:ALL) ALL
 
@@ -123,7 +123,7 @@
 
 - Commande à taper en sudo ou root 
 
-> apt-get install openssh-server
+> sudo apt-get install openssh-server
 
 - Reprendre l'adresse IP du serveur avec la commande 
 
@@ -135,9 +135,9 @@
 
 > sudo apt-get install nginx php-fpm
 
-- Lancer le serveur à chaque demarrage de la VM
+- Avec la commande suivante Nginx va se lancer automatiquement au lancement de la VM
 
->sudo systemctl enable nginx
+> sudo systemctl enable nginx
 
 ## Installation de MariaDB
 
@@ -158,7 +158,7 @@ sudo apt-get install mariadb-server
 
 Saisir ensuite le mot de passe souhaité pour la base de donnée MariaDB.
 
-Vérifier que la connexion à la base de donnée est fonctionnelle avec la commande
+Vérifier que la connexion à la base de données soit fonctionnelle avec la commande
 
 > mysql -p
 
@@ -206,7 +206,7 @@ Se connecter en root avec la commande : su
 
 Création de l'utilisateur 
 
-> adduser `nom d'utilsateur`
+> adduser `user`
 
 Insérer un mot de passe temporaire et confirmer le ensuite
 
@@ -218,7 +218,7 @@ Tapez la commande suivante pour forcer l'utilisateur à changer son mot de passe
 
 Maintenant on va bloquer l'accès des autres utilisateurs sur le répertoire du nouvel utilisateur créé précédemment avec la commande suivant 
 
-> chmod 700 /home/repertoire_du_nouvel_utilisateur
+> chmod 700 /home/repertoire_user
 
 ## Configuration de MariaDB 
 
@@ -283,18 +283,18 @@ Se rendre dans le dossier suivant
 
 Copier le fichier déjà présent à l'intérieur du répertoire
 
-> sudo cp www.conf utilisateur.conf
+> sudo cp www.conf `user`.conf
 
 Editez le fichier précédément copié 
 
-> sudo nano utilisateur.conf
+> sudo nano `user`.conf
 
 Modifier les valeurs suivantes dans le fichier 
 
 - La valeur [www] doit changer par [nom_de_domaine_du_site]
-- user = www-data => user = utilisateur
-- group = www-data => groupe = utilisateur
-- listen = /run/php/php7.0-fpm.sock => listen = /run/php/php7.0-fpm-utilisateur.sock
+- user = www-data => user = `user`
+- group = www-data => groupe = `user`
+- listen = /run/php/php7.0-fpm.sock => listen = /run/php/php7.0-fpm-`user`.sock
 
 Relancez ensuite php7.0-fpm
 
@@ -306,15 +306,15 @@ Suite à celà un nouveau fichier a été créé, dans le dossier /var/run/php/
 
 Créeons un site pour un utilisateur 
 
-> sudo mdkir -p /var/www/site1.monserver.com/html 
+> sudo mdkir -p /var/www/`site1.monserver.com`/html 
 
 Changer le propriétaire du dossier 
 
-> sudo chown  utilisateur:utilisateur -R /var/www/site1.monserver.com/html
+> sudo chown  utilisateur:utilisateur -R /var/www/site1.monserver.com/
 
 Créeons un fichier index.html pour le site de l'utilisateur
 
-> nano /var/www/site1.monserver.com/html/index.html
+> sudo nano /var/www/site1.monserver.com/html/index.html
 
 Inserez ceci dans le fichier 
 
@@ -365,14 +365,14 @@ server {
     
     location ~ \.php$ {
     	include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/run/php/php7.0-fpm-utilisateur.sock;
+        fastcgi_pass unix:/run/php/php7.0-fpm-`user`.sock;
     }
 }
 ```
 
-Etant donné que notre serveur est en local, modifiez le fichier host sur Windows ou sur Linux 
+Etant donné que notre serveur est en local, modifiez le fichier host sur Windows ou sur Linux ou Mac (lancer un terminal)
 
-Sur Linux 
+Sur Linux et Mac
 
 > sudo nano /etc/hosts
 
@@ -392,7 +392,7 @@ Créer un lien symbolique pour pouvoir accéder au site
 
 > sudo ln -s /etc/nginx/sites-available/site1 /etc/nginx/sites-enabled/
 
-redémarrer ensuite le serveur 
+Redémarrer ensuite le serveur Nginx
 
 > sudo service nginx restart
 
@@ -402,21 +402,37 @@ Tester ensuite la configuration sur un navigateur en mettant la ligne suivante d
 
 # Isolation des utilisateurs
 
-Pour chaque utilisateur, il faut limiter l'accès à l'home uniquement pour l'utilisateur concerné.
+Pour chaque utilisateur, il faut limiter l'accès au répertoire home pour l'utilisateur concerné.
 
-> sudo chmod 700 /home/nomutilisateur
+> sudo chmod 700 /home/`user`
 
-Faire la même commande excepté que cette fois-ci, cela sera le dossier du site de l'utilisateur qui se trouve dans /var/www.
+Grâce à celà, n'importe quel utilisateur (excepté root et un utilisateur ayant les droits sudo) peuvent accéder au répertoire ou lister le contenu. 
+
+Faire la même commande excepté que cette fois-ci, ce sera sur le dossier du site de l'utilisateur qui se trouve dans /var/www/.
 
 > sudo chmod 711 /var/www/siteutilisateur
 
-Pour chaque dossier de l'utilisateur (/home/nomutilisateur ainsi que /var/www/nomdusitedelutilisateur), il faut lui assigner son user. 
+Pour chaque dossier de l'utilisateur (/home/`user` ainsi que /var/www/`user`), il faut lui assigner son utilisateur. 
 
-> sudo chown nomutilisateur:nomutilisateur /home/nomutilisateur
+> sudo chown `user`:`user` /home/nomutilisateur
+
+Cette commande permettra à l'utilisateur d'accéder à son répertoire mais aussi de modifier le contenu. Les autres utilisateurs ne pourront pas y accéder ou modifier des choses, de même s'ils ne font pas partis du groupe de l'utilisateur.
+
+> `sudo chown nomutilisateur:www-data /var/www/nomdusitedelutilisateur`
 >
-> sudo chown nomutilisateur:www-data /var/www/nomdusitedelutilisateur
->
+> sudo chown `user`:`user` /var/www/nomdusitedelutilisateur
+
+Cette commande permettra à l'utilisateur d'accéder au répertoire de son site mais aussi de modifier le contenu. Les autres utilisateurs ne pourront pas y accéder ou modifier des choses, de même s'ils ne font pas partis du groupe de l'utilisateur.
+
 > sudo chmod 751 /var/www/nomdusitedelutilisateur/html/
->
+
+La modification des droits permet aux autres utilisateurs de pouvoir afficher le contenu du site sur un navigateur, mais ne pourront pas accéder au répertoire de celui-ci sur le serveur.
+
 > sudo chmod 640 /var/www/nomdusitedelutilisateur/html/*
+
+Nous modifions encore les droits des fichiers présents dans le répertoire html, ce qui permettra aux utilisateurs de ne pas pouvoir afficher le code source des fichiers.
+
+> sudo chgrp www-data /var/www/nomdusitedelutilisateur/html/*
+
+Nous ajoutons le groupe www-data, ce qui permettra aux utilisateurs de pouvoir afficher le site dans un navigateur.
 
