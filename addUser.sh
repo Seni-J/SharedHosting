@@ -14,6 +14,11 @@ read -s rootpwd
 adduser --disabled-password --gecos "" $username
 echo $username":"$password|chpasswd
 
+# Configure rights for the user
+echo "- Configuring user rights"
+chown -R $username:$username /home/$username
+chmod -R 700 /home/$username
+
 # Add little php homepage on the future user repertory
 echo "Configuration du site"
 mkdir -p /var/www/$domain/html
@@ -30,11 +35,6 @@ cat > /var/www/$domain/html/index.php <<TEXTBLOCK
 <?php
   phpinfo();
 TEXTBLOCK
-
-# Configure rights for the user
-echo "- Configuring user rights"
-chown -R $username:$username /home/$username
-chmod 770 /home/$username
 
 # create php pool
 echo "- Configuring php pool"
@@ -64,7 +64,7 @@ server {
     listen 80 ;
     listen [::]:80 ;
 
-    root /var/www/$username/html;
+    root /var/www/$domain/html;
 
     # Add index.php to the list if you are using PHP
     index index.html index.htm index.php;
@@ -89,18 +89,12 @@ ln -s /etc/nginx/sites-available/$username.conf /etc/nginx/sites-enabled/
 
 # utilisateur mariaDB
 echo "- Creating Database"
-mysql -uroot -proot <<EOF
+mysql -uroot -p$rootpwd <<EOF
 CREATE DATABASE db_$username;
 CREATE USER '$username'@'%' IDENTIFIED BY '$password';
 GRANT ALL privileges on db_$username.* to '$username'@'%' identified by '$password';
 FLUSH privileges;
 EOF
-
-#echo "- Creating database"
-#echo "CREATE DATABASE DB_"$username";" > /tmp.sql
-#echo "GRANT ALL privileges on nomDB.* to "$username"@'localhost' identified by "$password";" >> /tmp.sql
-
-#mysql -u "root" -p $rootpwd < /tmp.sql
 
 # bloquer accès au home aux autres utilisateurs
 chmod 700 /home/$username
@@ -112,7 +106,7 @@ chmod 711 /var/www/$domain
 chown $username:$username /home/$username
 
 # assigner le site à l'utilisateur
-chown $username:$username /var/www/$domain
+chown -R $username:$username /var/www/$domain
 
 # permet à l'utilisateur de modier le contenu de son
 chmod 751 /var/www/$domain/html/
@@ -146,4 +140,3 @@ cat <<TEXTBLOCK
 --------------------------------------------------------------
 TEXTBLOCK
 echo -e "\033[0m"
-
