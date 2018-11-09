@@ -450,8 +450,6 @@ Pour chaque dossier de l'utilisateur (/home/`user` ainsi que /var/www/`user`), i
 
 Cette commande permettra à l'utilisateur d'accéder à son répertoire mais aussi de modifier le contenu. Les autres utilisateurs ne pourront pas y accéder ou modifier des choses, de même s'ils ne font pas partis du groupe de l'utilisateur.
 
-> `sudo chown nomutilisateur:www-data /var/www/nomdusitedelutilisateur`
->
 > sudo chown `user`:`user` /var/www/nomdusitedelutilisateur
 
 Cette commande permettra à l'utilisateur d'accéder au répertoire de son site mais aussi de modifier le contenu. Les autres utilisateurs ne pourront pas y accéder ou modifier des choses, de même s'ils ne font pas partis du groupe de l'utilisateur.
