@@ -22,9 +22,7 @@ echo "Ajout d'une page internet"
 touch /var/www/$domain/html/index.html
 cat > /var/www/$domain/html/index.html <<TEXTBLOCK
 <div style="text-align: center;">
-  <h1>Welcome to our new website !</h1>
-  <h3>domain: $domain // username: $username</h3>
-  <hr>
+  <h1>Bienvenue sur le site $username !</h1>
 </div>
 
 <?php
@@ -140,4 +138,3 @@ cat <<TEXTBLOCK
 --------------------------------------------------------------
 TEXTBLOCK
 echo -e "\033[0m"
-
