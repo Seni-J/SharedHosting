@@ -14,18 +14,13 @@ read -s rootpwd
 adduser --disabled-password --gecos "" $username
 echo $username":"$password|chpasswd
 
-# Configure rights for the user
-echo "- Configuring user rights"
-chown -R $username:$username /home/$username
-chmod -R 700 /home/$username
-
 # Add little php homepage on the future user repertory
 echo "Configuration du site"
 mkdir -p /var/www/$domain/html
 
 echo "Ajout d'une page internet"
-touch /var/www/$domain/html/index.php
-cat > /var/www/$domain/html/index.php <<TEXTBLOCK
+touch /var/www/$domain/html/index.html
+cat > /var/www/$domain/html/index.html <<TEXTBLOCK
 <div style="text-align: center;">
   <h1>Welcome to our new website !</h1>
   <h3>domain: $domain // username: $username</h3>
@@ -35,6 +30,11 @@ cat > /var/www/$domain/html/index.php <<TEXTBLOCK
 <?php
   phpinfo();
 TEXTBLOCK
+
+# Configure rights for the user
+echo "- Configuring user rights"
+chown -R $username:$username /home/$username
+chmod 770 /home/$username
 
 # create php pool
 echo "- Configuring php pool"
@@ -61,8 +61,8 @@ echo "- Configuring nginx"
 touch /etc/nginx/sites-available/$username.conf
 cat > /etc/nginx/sites-available/$username.conf <<TEXTBLOCK
 server {
-    listen 80 ;
-    listen [::]:80 ;
+    listen 80;
+    listen [::]:80;
 
     root /var/www/$domain/html;
 
@@ -74,7 +74,7 @@ server {
     location / {
         # First attempt to serve request as file, then
         # as directory, then fall back to displaying a 404.
-        try_files $uri $uri/ =404;
+        try_files \$uri \$uri/ =404;
     }
 
     location ~ \.php$ {
@@ -140,3 +140,4 @@ cat <<TEXTBLOCK
 --------------------------------------------------------------
 TEXTBLOCK
 echo -e "\033[0m"
+
